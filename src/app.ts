@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 const app = express();
 import morgan from "morgan";
 import productRoutes from "./api/routes/products.js";
@@ -14,9 +14,9 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
-  if (req.method === 'OPTIONS') {
-      res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
-      return res.status(200).json({});
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+    return res.status(200).json({});
   }
   next();
 });
@@ -27,17 +27,24 @@ app.use("/orders", orderRoutes);
 
 app.use((_, _2, next) => {
   const error = new Error("Not found");
-  error.status = 404;
+  (error as any).status = 404;
   next(error);
 });
 
-app.use((error, _, res, _2) => {
-  res.status(error.status || 500);
-  res.json({
-    error: {
-      message: error.message
-    }
-  });
-});
+app.use(
+  (
+    error: Error & { status?: number },
+    _: Request,
+    res: Response,
+    _2: NextFunction
+  ) => {
+    res.status(error.status || 500);
+    res.json({
+      error: {
+        message: error.message,
+      },
+    });
+  }
+);
 
 export default app;

@@ -1,4 +1,4 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
 router.get("/", (_, res, _2) => {
@@ -44,4 +44,4 @@ router.delete("/:productId", (_, res, _2) => {
   });
 });
 
-module.exports = router;
+export default router;
