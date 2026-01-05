@@ -1,5 +1,5 @@
-const express = require('express');
-const router = express.Router();
+import { Router } from 'express';
+const router = Router();
 
 // Handle incoming GET requests to /orders
 router.get('/', (req, res, next) => {
@@ -28,4 +28,4 @@ router.delete('/:orderId', (req, res, next) => {
     });
 });
 
-module.exports = router;
+export default router;
