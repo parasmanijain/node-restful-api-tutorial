@@ -1,9 +1,9 @@
-import express, { Request, Response, NextFunction } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import Order from "../models/order.js";
 import Product from "../models/product.js";
 
-const router = express.Router();
+const router = Router();
 
 /**
  * GET /orders
