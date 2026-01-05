@@ -1,6 +1,5 @@
 import express, { Application, Request, Response, NextFunction } from "express";
 import morgan from "morgan";
-
 import productRoutes from "./api/routes/products.js";
 import orderRoutes from "./api/routes/orders.js";
 
