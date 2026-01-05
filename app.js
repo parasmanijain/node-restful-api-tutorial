@@ -1,14 +1,12 @@
-const express = require("express");
+import express from "express";
 const app = express();
-const morgan = require("morgan");
-const bodyParser = require("body-parser");
-
-const productRoutes = require("./api/routes/products");
-const orderRoutes = require("./api/routes/orders");
+import morgan from "morgan";
+import productRoutes from "./api/routes/products.js";
+import orderRoutes from "./api/routes/orders.js";
 
 app.use(morgan("dev"));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -27,13 +25,13 @@ app.use((req, res, next) => {
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
 
-app.use((req, res, next) => {
+app.use((_, _2, next) => {
   const error = new Error("Not found");
   error.status = 404;
   next(error);
 });
 
-app.use((error, req, res, next) => {
+app.use((error, _, res, _2) => {
   res.status(error.status || 500);
   res.json({
     error: {
@@ -42,4 +40,4 @@ app.use((error, req, res, next) => {
   });
 });
 
-module.exports = app;
+export default app;
