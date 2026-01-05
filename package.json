@@ -2,11 +2,11 @@
   "name": "rest-shop",
   "version": "1.0.0",
   "description": "A Node.js RESTful API Tutorial Project (Build a simple shop API)",
-  "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "dev": "nodemon",
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "keywords": [
     "node",
@@ -21,6 +21,10 @@
     "morgan": "^1.10.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "@types/express": "^4.17.21",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^20.11.0",
+    "nodemon": "^3.1.11",
+    "typescript": "^5.4.0"
   }
 }
