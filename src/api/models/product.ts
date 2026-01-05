@@ -1,9 +1,24 @@
-import mongoose from "mongoose";
+import { Schema, model, Types } from "mongoose";
 
-const productSchema = mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
-  name: { type: String, required: true },
-  price: { type: Number, required: true },
+export interface Product {
+  _id: Types.ObjectId;
+  name: string;
+  price: number;
+}
+
+const productSchema = new Schema<Product>({
+  _id: {
+    type: Schema.Types.ObjectId,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
 });
 
-module.exports = mongoose.model("Product", productSchema);
+export default model<Product>("Product", productSchema);

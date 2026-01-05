@@ -1,25 +1,41 @@
-import express, { json, urlencoded } from "express";
+import express, {
+  json,
+  urlencoded,
+  Request,
+  Response,
+  NextFunction,
+} from "express";
 const app = express();
 import morgan from "morgan";
 import mongoose from "mongoose";
 
-import productRoutes from "./api/routes/products";
-import orderRoutes from "./api/routes/orders";
+import productRoutes from "./api/routes/products.js";
+import orderRoutes from "./api/routes/orders.js";
 
-mongoose.connect(
-  "mongodb://node-shop:" +
-    process.env.MONGO_ATLAS_PW +
-    "@node-rest-shop-shard-00-00-wovcj.mongodb.net:27017,node-rest-shop-shard-00-01-wovcj.mongodb.net:27017,node-rest-shop-shard-00-02-wovcj.mongodb.net:27017/test?ssl=true&replicaSet=node-rest-shop-shard-0&authSource=admin",
-  {
-    useMongoClient: true,
-  }
-);
-mongoose.Promise = global.Promise;
+/**
+ * MongoDB connection
+ * (use environment variables in real projects)
+ */
+const mongoUri = `mongodb+srv://node-shop:${process.env.MONGO_ATLAS_PW}@node-rest-shop-shard-0.wovcj.mongodb.net/test?retryWrites=true&w=majority`;
 
+mongoose
+  .connect(mongoUri)
+  .then(() => {
+    console.log("MongoDB connected");
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
+/**
+ * Middleware
+ */
 app.use(morgan("dev"));
 app.use(urlencoded({ extended: false }));
 app.use(json());
 
+/**
+ * CORS
+ */
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -33,23 +49,38 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes which should handle requests
+/**
+ * Routes
+ */
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
 
-app.use((req, res, next) => {
-  const error = new Error("Not found");
+/**
+ * 404 handler
+ */
+app.use((_: Request, _2: Response, next: NextFunction) => {
+  const error = new Error("Not found") as Error & { status?: number };
   error.status = 404;
   next(error);
 });
 
-app.use((error, req, res, next) => {
-  res.status(error.status || 500);
-  res.json({
-    error: {
-      message: error.message,
-    },
-  });
-});
+/**
+ * Global error handler
+ */
+app.use(
+  (
+    error: Error & { status?: number },
+    _: Request,
+    res: Response,
+    _2: NextFunction
+  ) => {
+    res.status(error.status ?? 500);
+    res.json({
+      error: {
+        message: error.message,
+      },
+    });
+  }
+);
 
-module.exports = app;
+export default app;
