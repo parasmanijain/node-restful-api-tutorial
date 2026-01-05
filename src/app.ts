@@ -1,4 +1,11 @@
-import express, { Application, Request, Response, NextFunction } from "express";
+import express, {
+  Application,
+  Request,
+  Response,
+  NextFunction,
+  urlencoded,
+  json,
+} from "express";
 import morgan from "morgan";
 import mongoose from "mongoose";
 import productRoutes from "./api/routes/products.js";
@@ -10,7 +17,7 @@ const app: Application = express();
  * MongoDB connection
  * (use environment variables in real projects)
  */
-const mongoUri = `mongodb+srv://node-shop:${process.env.MONGO_ATLAS_PW}@node-rest-shop-shard-0.wovcj.mongodb.net/test?retryWrites=true&w=majority`;
+const mongoUri = `${process.env.MONGODB_URI}`;
 
 mongoose
   .connect(mongoUri)
@@ -25,8 +32,8 @@ mongoose
  * Middleware
  */
 app.use(morgan("dev"));
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+app.use(urlencoded({ extended: false }));
+app.use(json());
 
 /**
  * CORS
