@@ -1,12 +1,18 @@
-import express, { NextFunction, Request, Response } from "express";
+import express, {
+  json,
+  NextFunction,
+  Request,
+  Response,
+  urlencoded,
+} from "express";
 const app = express();
 import morgan from "morgan";
 import productRoutes from "./api/routes/products.js";
 import orderRoutes from "./api/routes/orders.js";
 
 app.use(morgan("dev"));
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+app.use(urlencoded({ extended: false }));
+app.use(json());
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
