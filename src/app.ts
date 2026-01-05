@@ -1,28 +1,45 @@
-const express = require("express");
-const app = express();
-const morgan = require("morgan");
-const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
+import express, {
+  Application,
+  Request,
+  Response,
+  NextFunction,
+  urlencoded,
+  json,
+} from "express";
+import morgan from "morgan";
+import mongoose from "mongoose";
+import productRoutes from "./api/routes/products.js";
+import orderRoutes from "./api/routes/orders.js";
 
-const productRoutes = require("./api/routes/products");
-const orderRoutes = require("./api/routes/orders");
+const app: Application = express();
 
-mongoose.connect(
-  "mongodb://node-shop:" +
-    process.env.MONGO_ATLAS_PW +
-    "@node-rest-shop-shard-00-00-wovcj.mongodb.net:27017,node-rest-shop-shard-00-01-wovcj.mongodb.net:27017,node-rest-shop-shard-00-02-wovcj.mongodb.net:27017/test?ssl=true&replicaSet=node-rest-shop-shard-0&authSource=admin",
-  {
-    useMongoClient: true
-  }
-);
-mongoose.Promise = global.Promise;
+/**
+ * MongoDB connection
+ * (use environment variables in real projects)
+ */
+const mongoUri = `${process.env.MONGODB_URI}`;
 
+mongoose
+  .connect(mongoUri)
+  .then(() => {
+    console.log("MongoDB connected");
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
+
+/**
+ * Middleware
+ */
 app.use(morgan("dev"));
-app.use('/uploads', express.static('uploads'));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use("/uploads", express.static("uploads"));
+app.use(urlencoded({ extended: false }));
+app.use(json());
 
-app.use((req, res, next) => {
+/**
+ * CORS
+ */
+app.use((req: Request, res: Response, next: NextFunction) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
@@ -35,23 +52,38 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes which should handle requests
+/**
+ * Routes
+ */
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
 
-app.use((req, res, next) => {
-  const error = new Error("Not found");
+/**
+ * 404 handler
+ */
+app.use((_: Request, _2: Response, next: NextFunction) => {
+  const error = new Error("Not found") as Error & { status?: number };
   error.status = 404;
   next(error);
 });
 
-app.use((error, req, res, next) => {
-  res.status(error.status || 500);
-  res.json({
-    error: {
-      message: error.message
-    }
-  });
-});
+/**
+ * Global error handler
+ */
+app.use(
+  (
+    error: Error & { status?: number },
+    _: Request,
+    res: Response,
+    _2: NextFunction
+  ) => {
+    res.status(error.status ?? 500);
+    res.json({
+      error: {
+        message: error.message,
+      },
+    });
+  }
+);
 
-module.exports = app;
+export default app;
