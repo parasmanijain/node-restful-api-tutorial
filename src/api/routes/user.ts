@@ -1,42 +1,42 @@
-const express = require("express");
-const router = express.Router();
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+import { Router } from "express";
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import User from "../models/user.js";
 
-const User = require("../models/user");
+const router = Router();
 
 router.post("/signup", (req, res, next) => {
   User.find({ email: req.body.email })
     .exec()
-    .then(user => {
+    .then((user) => {
       if (user.length >= 1) {
         return res.status(409).json({
-          message: "Mail exists"
+          message: "Mail exists",
         });
       } else {
         bcrypt.hash(req.body.password, 10, (err, hash) => {
           if (err) {
             return res.status(500).json({
-              error: err
+              error: err,
             });
           } else {
             const user = new User({
               _id: new mongoose.Types.ObjectId(),
               email: req.body.email,
-              password: hash
+              password: hash,
             });
             user
               .save()
-              .then(result => {
+              .then((result) => {
                 console.log(result);
                 res.status(201).json({
-                  message: "User created"
+                  message: "User created",
                 });
               })
-              .catch(err => {
+              .catch((err) => {
                 console.log(err);
                 res.status(500).json({
-                  error: err
+                  error: err,
                 });
               });
           }
@@ -48,17 +48,17 @@ router.post("/signup", (req, res, next) => {
 router.delete("/:userId", (req, res, next) => {
   User.remove({ _id: req.params.userId })
     .exec()
-    .then(result => {
+    .then((result) => {
       res.status(200).json({
-        message: "User deleted"
+        message: "User deleted",
       });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
       res.status(500).json({
-        error: err
+        error: err,
       });
     });
 });
 
-module.exports = router;
+export default router;
