@@ -1,10 +1,10 @@
-const express = require('express');
+import express from 'express';
 const app = express();
 
-app.use((req, res, next) => {
+app.use((_, res, _2) => {
     res.status(200).json({
         message: 'It works!'
     });
 });
 
-module.exports = app;
+export default app;
