@@ -3,3 +3,5 @@ nodemon.json
 uploads
 dist
 .env
+.slingshot
+.vscode
